@@ -275,7 +275,7 @@
             await safeClick(buttons.navigation.labyrinth())
             await safeClick($('button'))
             await safeClick(buttons.misc.captchaClose())
-            this.timers.labyrinthReward = setTimeout(() => safeClick($('div.main-section__body > div > div > button')), 120 * 1000)
+            this.timers.labyrinthReward = setTimeout(() => safeClick($('div.main-section__body > div > div > button')), 150 * 1000)
             await safeClick(buttons.misc.view())
         }
 
