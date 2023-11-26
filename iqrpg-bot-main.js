@@ -8,7 +8,7 @@
 // @match           http://test.iqrpg.com/game*
 // @icon            data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @require         https://cdn.jsdelivr.net/gh/lodash/lodash@4.17.4/dist/lodash.min.js
-// @require         https://github.com/mdrozdovz/iqrpg-bot/raw/master/character-settings.js?v=4
+// @require         https://github.com/mdrozdovz/iqrpg-bot/raw/master/character-settings.js?v=5
 // @downloadURL     https://github.com/mdrozdovz/iqrpg-bot/raw/master/iqrpg-bot-main.js
 // @updateURL       https://github.com/mdrozdovz/iqrpg-bot/raw/master/version
 // @grant           GM_info
@@ -61,8 +61,13 @@
     const log = (msg, ...data) => {
         const now = new Date()
         const prefix = `[${now.toDateString()} ${now.toTimeString().split(' ')[0]}][IQRPG Bot]:`
-        if (data) console.log(`${prefix} ${msg}`, ...data)
-        else console.log(`${prefix} ${msg}`)
+        console.log(`${prefix} ${msg}`, ...data)
+    }
+
+    const warn = (msg, ...data) => {
+        const now = new Date()
+        const prefix = `[${now.toDateString()} ${now.toTimeString().split(' ')[0]}][IQRPG Bot]:`
+        console.warn(`${prefix} ${msg}`, ...data)
     }
 
     const safeClick = async button => {
@@ -193,6 +198,10 @@
                 await safeClick(btns.shift())
                 const rows = $$('table.table-invisible > tr')
                 for (const row of rows) {
+                    if (_.isEmpty(row.children)) {
+                        warn('collectInventory: Skipping bad row', row)
+                        continue
+                    }
                     const type = row.children[0].querySelector('p').textContent.replaceAll(/[\[\]]/g, '')
                     const value = parseInt(row.children[1].textContent.replaceAll(',', ''))
                     res[type] = value

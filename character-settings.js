@@ -108,12 +108,16 @@ class Resource {
 }
 
 const charSettings = {
-    Arius: { roles: [Role.Battler, Role.Main], },
-    Battlarius: { roles: [Role.Battler, Role.Alt], },
-    Killarius: { roles: [Role.Battler, Role.Alt], },
-    Huntarius: { roles: [Role.Battler, Role.Alt], },
-    Gladiarius: { roles: [Role.Battler, Role.Alt], },
-    Mercenarius: { roles: [Role.Battler, Role.Alt], },
+    Arius: { roles: [Role.Battler, Role.Main, Role.Dungeoneer], },
+    Battlarius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Killarius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Huntarius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Gladiarius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Mercenarius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Wararius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Legionarius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Lancarius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Knightarius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
     Wooarius: {
         roles: [Role.Tradeskiller, Role.Woodcutter, Role.Alchemist, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Wood,
@@ -130,19 +134,35 @@ const charSettings = {
         roles: [Role.Tradeskiller, Role.Woodcutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Wood,
     },
+    Logarius: {
+        roles: [Role.Tradeskiller, Role.Woodcutter, Role.Alt, Role.Dungeoneer],
+        resource: Resource.Resources.Wood,
+    },
+    Timberarius: {
+        roles: [Role.Tradeskiller, Role.Woodcutter, Role.Alt, Role.Dungeoneer],
+        resource: Resource.Resources.Wood,
+    },
     Stonarius: {
-        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt],
+        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Stone,
     },
     Quararius: {
-        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt],
+        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Stone,
     },
     Rockarius: {
-        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt],
+        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Stone,
     },
     Bouldarius: {
+        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
+        resource: Resource.Resources.Stone,
+    },
+    Brickarius: {
+        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
+        resource: Resource.Resources.Stone,
+    },
+    Masonarius: {
         roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Stone,
     },
@@ -159,6 +179,14 @@ const charSettings = {
         resource: Resource.Resources.Metal,
     },
     Minerarius: {
+        roles: [Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
+        resource: Resource.Resources.Metal,
+    },
+    Dredgarius: {
+        roles: [Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
+        resource: Resource.Resources.Metal,
+    },
+    Prospectarius: {
         roles: [Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Metal,
     },
