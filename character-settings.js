@@ -16,6 +16,13 @@ class Resource {
     static Currency = {
         Gold: 'Gold',
         Credits: 'Credits',
+        BoundCredits: 'Bound Credits',
+        HonorTokens: 'Honor Tokens',
+        BossTokens: 'Boss Tokens',
+        DungeoneeringTokens: 'Dungeoneering Tokens',
+        GatheringSkillShard: 'Gathering Skill Shard',
+        ArtisanShard: 'Artisan Shard',
+        HeroicShard: 'Heroic Shard',
     }
     static Resources = {
         Wood: 'Wood',
@@ -179,5 +186,5 @@ const findCharsByRole = role => {
 }
 
 if (module) {
-    module.exports = { charSettings }
+    module.exports = { charSettings, findCharsByRole }
 }
