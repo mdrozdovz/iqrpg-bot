@@ -23,28 +23,30 @@
     const delay = ms => new Promise(r => setTimeout(r, ms))
 
     const defaultSettings = {
-        inventoryUpdateIntervalSeconds: 900,
+        inventoryUpdate: {
+            intervalSeconds: 3660
+        },
         taskExecutor: {
             intervalSeconds: 30
         },
         resourceWire: {
             enabled: true,
-            checkIntervalSeconds: 3 * 3600,
+            intervalSeconds: 3 * 3600,
             exceedFactor: 1.5,
             rssAltsFactor: 0.5,
             goldAltsFactor: 0.75,
         },
         alchemistWire: {
             enabled: true,
-            intervalSeconds: 7200,
+            intervalSeconds: 2 * 3600,
         },
         runeCrafterWire: {
             enabled: true,
-            intervalSeconds: 7200,
+            intervalSeconds: 2 * 3600,
         },
         jewelCrafterWire: {
             enabled: true,
-            intervalSeconds: 7200,
+            intervalSeconds: 2 * 3600,
         },
         labyrinth: {
             enabled: true,
@@ -301,12 +303,13 @@
         setupTaskExecutor() {
             return setInterval(this.processQueue.bind(this), this.settings.taskExecutor.intervalSeconds * 1000)
         }
+
         setupInventoryUpdate() {
             const task = {
                 name: 'Inventory update',
                 exec: async () => this.inventory = await this.collectInventory()
             }
-            return setInterval(this.taskQueue.push(task), this.settings.inventoryUpdateIntervalSeconds * 1000)
+            return setInterval(() => this.taskQueue.push(task), this.settings.inventoryUpdate.intervalSeconds * 1000)
         }
 
         setupResourceWire() {
@@ -314,7 +317,7 @@
                 name: 'Resource wire',
                 exec: this.wireToMain.bind(this)
             }
-            return setInterval(this.taskQueue.push(task), this.settings.resourceWire.checkIntervalSeconds * 1000)
+            return setInterval(() => this.taskQueue.push(task), this.settings.resourceWire.intervalSeconds * 1000)
         }
 
         setupAlchemistWire() {
@@ -322,7 +325,7 @@
                 name: 'Alchemist wire',
                 exec: this.wireToAlchemist.bind(this)
             }
-            return setInterval(this.taskQueue.push(task), this.settings.alchemistWire.checkIntervalSeconds * 1000)
+            return setInterval(() => this.taskQueue.push(task), this.settings.alchemistWire.intervalSeconds * 1000)
         }
 
         setupRuneCrafterWire() {
@@ -330,7 +333,7 @@
                 name: 'RuneCrafter wire',
                 exec: this.wireToRuneCrafter.bind(this)
             }
-            return setInterval(this.taskQueue.push(task), this.settings.runeCrafterWire.checkIntervalSeconds * 1000)
+            return setInterval(() => this.taskQueue.push(task), this.settings.runeCrafterWire.intervalSeconds * 1000)
         }
 
         setupJewelCrafterWire() {
@@ -338,7 +341,7 @@
                 name: 'JewelCrafter wire',
                 exec: this.wireToJewelCrafter.bind(this)
             }
-            return setInterval(this.taskQueue.push(task), this.settings.jewelCrafterWire.checkIntervalSeconds * 1000)
+            return setInterval(() => this.taskQueue.push(task), this.settings.jewelCrafterWire.intervalSeconds * 1000)
         }
 
         setupLabyrinth() {
@@ -346,7 +349,7 @@
                 name: 'Labyrinth',
                 exec: this.runLabyrinth.bind(this)
             }
-            return setInterval(this.taskQueue.push(task), this.settings.labyrinth.intervalSeconds * 1000)
+            return setInterval(() => this.taskQueue.push(task), this.settings.labyrinth.intervalSeconds * 1000)
         }
 
         setupRaids() {
@@ -354,7 +357,7 @@
                 name: 'Raiding',
                 exec: this.runRaid.bind(this)
             }
-            return setInterval(this.taskQueue.push(task), this.settings.raids.intervalSeconds * 1000)
+            return setInterval(() => this.taskQueue.push(task), this.settings.raids.intervalSeconds * 1000)
         }
 
         resInfo() {
@@ -425,6 +428,7 @@
         stop() {
             log('Stopping IQRPG Bot')
             for (const [key, val] of Object.entries(this.timers)) {
+                log('Clearing interval:', key, val)
                 clearInterval(val)
             }
             this.timers = {}
