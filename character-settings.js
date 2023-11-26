@@ -38,7 +38,7 @@ class Resource {
         GemFragments: 'Gem Fragments',
         TrinketFragments: 'Trinket Fragments',
         RunicLeather: 'Runic Leather',
-        TrinketEssence: 'Trinket Essence',
+        // TrinketEssence: 'Trinket Essence',
     }
     static AlchemyIngredients = {
         TreeSap: 'Tree Sap',
@@ -48,7 +48,7 @@ class Resource {
         VialOfOrcBlood: 'Vial of Orc Blood',
         UndeadHeart: 'Undead Heart',
         BirdsNest: "Bird's Nest",
-        AlchemicEssence: 'Alchemic Essence',
+        // AlchemicEssence: 'Alchemic Essence',
         GoldenEgg: 'Golden Egg',
         DemonicDust: 'Demonic Dust',
     }
@@ -58,7 +58,7 @@ class Resource {
         MinorGatheringPotion: 'Minor Gathering Potion',
         MinorExpPotion: 'Minor Exp Potion',
         HastePotion: 'Haste Potion',
-        SuperiorHastePotion: 'Superior Haste Potion',
+        //SuperiorHastePotion: 'Superior Haste Potion',
         MinorAutosPotion: 'Minor Autos Potion',
         AptitudePotion: 'Aptitude Potion',
         GreaterExpPotion: 'Greater Exp Potion',

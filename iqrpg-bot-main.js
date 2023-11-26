@@ -8,7 +8,7 @@
 // @match           http://test.iqrpg.com/game*
 // @icon            data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @require         https://cdn.jsdelivr.net/gh/lodash/lodash@4.17.4/dist/lodash.min.js
-// @require         https://github.com/mdrozdovz/iqrpg-bot/raw/master/character-settings.js?v=10
+// @require         https://github.com/mdrozdovz/iqrpg-bot/raw/master/character-settings.js?v=4
 // @downloadURL     https://github.com/mdrozdovz/iqrpg-bot/raw/master/iqrpg-bot-main.js
 // @updateURL       https://github.com/mdrozdovz/iqrpg-bot/raw/master/version
 // @grant           GM_info
@@ -26,10 +26,6 @@
         inventoryUpdateIntervalSeconds: 900,
         taskExecutor: {
             intervalSeconds: 30
-        },
-        labyrinth: {
-            enabled: true,
-            intervalSeconds: 3600
         },
         resourceWire: {
             enabled: true,
@@ -49,6 +45,14 @@
         jewelCrafterWire: {
             enabled: true,
             intervalSeconds: 7200,
+        },
+        labyrinth: {
+            enabled: true,
+            intervalSeconds: 3600
+        },
+        raids: {
+            enabled: true,
+            intervalSeconds: 3600
         },
     }
 
@@ -94,6 +98,7 @@
             inventory: () => $('a[href*="inventory"]'),
             market: () => $('a[href*="market"]'),
             labyrinth: () => $('a[href*="labyrinth"]'),
+            land: () => $('a[href*="land"]'),
         },
         inventory: {
             jewels: () => $('div.menu > a[href="/inventory_jewels"]'),
@@ -104,6 +109,11 @@
             sendItems: () => $('a[href*=send_items]'),
             confirm: () => $('p > button'),
             change: () => $('table.table-invisible > tr > td > span > a')
+        },
+        land: {
+            personnel: () => $('a[href*=personnel]'),
+            raids: () => $('a[href*=raids]'),
+            portals: () => $('a[href*=portals]'),
         },
         misc: {
             captchaClose: () => $('div.modal > div.close'),
@@ -261,6 +271,33 @@
                 await wireItem(jc, gem, this.inventory[gem])
         }
 
+        async runLabyrinth() {
+            await safeClick(buttons.navigation.labyrinth())
+            await safeClick($('button'))
+            await safeClick(buttons.misc.captchaClose())
+            this.timers.labyrinthReward = setTimeout(() => safeClick($('div.main-section__body > div > div > button')), 120 * 1000)
+            await safeClick(buttons.misc.view())
+        }
+
+        async runRaid() {
+            await safeClick(buttons.navigation.land())
+            await safeClick(buttons.land.raids())
+
+            const rows = [...$$('table.table-invisible > tr')]
+            const row = rows[1]
+            const btn = row.querySelector('td:nth-child(2) > div > a')
+            if (btn && btn.innerText !== 'Get Rewards') {
+                await safeClick(buttons.misc.view())
+                return
+            }
+            await safeClick(btn)
+
+            const raidsTable = _.last([...$$('table.table-invisible')])
+            const raidBtn = _.last([... raidsTable.querySelectorAll('tr')])?.querySelector('td > a')
+            await safeClick(raidBtn)
+            await safeClick(buttons.misc.view())
+        }
+
         setupTaskExecutor() {
             return setInterval(this.processQueue.bind(this), this.settings.taskExecutor.intervalSeconds * 1000)
         }
@@ -302,6 +339,22 @@
                 exec: this.wireToJewelCrafter.bind(this)
             }
             return setInterval(this.taskQueue.push(task), this.settings.jewelCrafterWire.checkIntervalSeconds * 1000)
+        }
+
+        setupLabyrinth() {
+            const task = {
+                name: 'Labyrinth',
+                exec: this.runLabyrinth.bind(this)
+            }
+            return setInterval(this.taskQueue.push(task), this.settings.labyrinth.intervalSeconds * 1000)
+        }
+
+        setupRaids() {
+            const task = {
+                name: 'Raiding',
+                exec: this.runRaid.bind(this)
+            }
+            return setInterval(this.taskQueue.push(task), this.settings.raids.intervalSeconds * 1000)
         }
 
         resInfo() {
@@ -362,6 +415,8 @@
             if (this.settings.alchemistWire?.enabled) this.timers.alchemistWire = this.setupAlchemistWire()
             if (this.settings.runeCrafterWire?.enabled) this.timers.runeCrafterWire = this.setupRuneCrafterWire()
             if (this.settings.jewelCrafterWire?.enabled) this.timers.jewelCrafterWire = this.setupJewelCrafterWire()
+            if (this.settings.labyrinth?.enabled) this.timers.labyrinth = this.setupLabyrinth()
+            if (this.settings.raids?.enabled) this.timers.raids = this.setupRaids()
             // this.attachKeyBinds()
             // this.miscellaneous()
             this.printTimers()
