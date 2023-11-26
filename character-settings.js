@@ -165,10 +165,16 @@ const charSettings = {
     Runarius: {
         roles: [Role.RuneCrafter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Stone,
+        labyrinth: {
+            enabled: false,
+        },
     },
     Jewelarius: {
         roles: [Role.JewelCrafter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Metal,
+        labyrinth: {
+            enabled: false,
+        },
     },
 }
 
