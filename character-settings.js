@@ -114,51 +114,51 @@ const charSettings = {
     Mercenarius: { roles: [Role.Battler, Role.Alt], },
     Wooarius: {
         roles: [Role.Woodcutter, Role.Alchemist, Role.Alt],
-        resource: Resource.Wood,
+        resource: Resource.Resources.Wood,
     },
     Woodarius: {
         roles: [Role.Woodcutter, Role.Alt],
-        resource: Resource.Wood,
+        resource: Resource.Resources.Wood,
     },
     Choparius: {
         roles: [Role.Woodcutter, Role.Alt],
-        resource: Resource.Wood,
+        resource: Resource.Resources.Wood,
     },
     Lumberarius: {
         roles: [Role.Woodcutter, Role.Alt],
-        resource: Resource.Wood,
+        resource: Resource.Resources.Wood,
     },
     Minarius: {
         roles: [Role.Miner, Role.Alt],
-        resource: Resource.Metal,
+        resource: Resource.Resources.Metal,
     },
     Metalarius: {
         roles: [Role.Miner, Role.Alt],
-        resource: Resource.Metal,
+        resource: Resource.Resources.Metal,
     },
     Gemarius: {
         roles: [Role.Miner, Role.Alt],
-        resource: Resource.Metal,
+        resource: Resource.Resources.Metal,
     },
     Minerarius: {
         roles: [Role.Miner, Role.Alt],
-        resource: Resource.Metal,
+        resource: Resource.Resources.Metal,
     },
     Stonarius: {
         roles: [Role.Stonecutter, Role.Alt],
-        resource: Resource.Stone,
+        resource: Resource.Resources.Stone,
     },
     Quararius: {
         roles: [Role.Stonecutter, Role.Alt],
-        resource: Resource.Stone,
+        resource: Resource.Resources.Stone,
     },
     Rockarius: {
         roles: [Role.Stonecutter, Role.Alt],
-        resource: Resource.Stone,
+        resource: Resource.Resources.Stone,
     },
     Bouldarius: {
         roles: [Role.Stonecutter, Role.Alt],
-        resource: Resource.Stone,
+        resource: Resource.Resources.Stone,
     },
     Runarius: {
         roles: [Role.RuneCrafter, Role.Alt],
