@@ -238,12 +238,16 @@
                 }
                 await wireItem(alt, Resource.Currency.Gold, goldToWire)
             }
+
             log('Wiring dungeon keys')
-            for (const dun of dungeoneers)
+            for (const dun of dungeoneers) {
                 for (const type of Object.values(Resource.DungeonKeys)) {
-                    await wireItem(dun, type, this.inventory[type] / dungeoneers.length)
+                    const keysToWire = Math.floor(this.inventory[type] / dungeoneers.length)
+                    await wireItem(dun, type, keysToWire)
                 }
-            const tcToWire = this.inventory[Resource.CraftingComponents.ToolComponent] / tsers.length
+            }
+
+            const tcToWire = Math.floor(this.inventory[Resource.CraftingComponents.ToolComponent] / tsers.length)
             log('Wiring tool components:', tcToWire)
             for (const tser of tsers)
                 await wireItem(tser, Resource.CraftingComponents.ToolComponent, tcToWire)
@@ -277,7 +281,10 @@
             await safeClick(buttons.navigation.labyrinth())
             await safeClick($('button'))
             await safeClick(buttons.misc.captchaClose())
-            this.timers.labyrinthReward = setTimeout(() => safeClick($('div.main-section__body > div > div > button')), 150 * 1000)
+            this.timers.labyrinthReward = setTimeout(async () => {
+                await safeClick($('div.main-section__body > div > div > button')) // Claim rewards
+                await safeClick($('div.main-section__body > div > div > a:not([href])')) // Close window
+            }, 150 * 1000)
             await safeClick(buttons.misc.view())
         }
 
