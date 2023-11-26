@@ -1,0 +1,13 @@
+// ==UserScript==
+// @name            IQRPG-Bot
+// @namespace       http://tampermonkey.net/
+// @version         0.1.0
+// @description     try to take over the world!
+// @author          mdrozdovz
+// @match           https://test.iqrpg.com/game.html
+// @match           http://test.iqrpg.com/game.html
+// @icon            data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
+// @downloadURL     https://github.com/mdrozdovz/iqrpg-bot/raw/master/iqrpg-bot-main.js
+// @updateURL       https://github.com/mdrozdovz/iqrpg-bot/raw/master/version
+// @grant           none
+// ==/UserScript==
