@@ -2,6 +2,7 @@
 
 class Role {
     static Battler = 'battler'
+    static Tradeskiller = 'tradeskiller'
     static Woodcutter = 'woodcutter'
     static Stonecutter = 'stonecutter'
     static Miner = 'miner'
@@ -10,6 +11,7 @@ class Role {
     static JewelCrafter = 'jewelcrafter'
     static Main = 'main'
     static Alt = 'alt'
+    static Dungeoneer = 'dungeoneer'
 }
 
 class Resource {
@@ -113,66 +115,60 @@ const charSettings = {
     Gladiarius: { roles: [Role.Battler, Role.Alt], },
     Mercenarius: { roles: [Role.Battler, Role.Alt], },
     Wooarius: {
-        roles: [Role.Woodcutter, Role.Alchemist, Role.Alt],
+        roles: [Role.Tradeskiller, Role.Woodcutter, Role.Alchemist, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Wood,
     },
     Woodarius: {
-        roles: [Role.Woodcutter, Role.Alt],
+        roles: [Role.Tradeskiller, Role.Woodcutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Wood,
     },
     Choparius: {
-        roles: [Role.Woodcutter, Role.Alt],
+        roles: [Role.Tradeskiller, Role.Woodcutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Wood,
     },
     Lumberarius: {
-        roles: [Role.Woodcutter, Role.Alt],
+        roles: [Role.Tradeskiller, Role.Woodcutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Wood,
     },
-    Minarius: {
-        roles: [Role.Miner, Role.Alt],
-        resource: Resource.Resources.Metal,
-    },
-    Metalarius: {
-        roles: [Role.Miner, Role.Alt],
-        resource: Resource.Resources.Metal,
-    },
-    Gemarius: {
-        roles: [Role.Miner, Role.Alt],
-        resource: Resource.Resources.Metal,
-    },
-    Minerarius: {
-        roles: [Role.Miner, Role.Alt],
-        resource: Resource.Resources.Metal,
-    },
     Stonarius: {
-        roles: [Role.Stonecutter, Role.Alt],
+        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt],
         resource: Resource.Resources.Stone,
     },
     Quararius: {
-        roles: [Role.Stonecutter, Role.Alt],
+        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt],
         resource: Resource.Resources.Stone,
     },
     Rockarius: {
-        roles: [Role.Stonecutter, Role.Alt],
+        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt],
         resource: Resource.Resources.Stone,
     },
     Bouldarius: {
-        roles: [Role.Stonecutter, Role.Alt],
+        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Stone,
     },
+    Minarius: {
+        roles: [Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
+        resource: Resource.Resources.Metal,
+    },
+    Metalarius: {
+        roles: [Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
+        resource: Resource.Resources.Metal,
+    },
+    Gemarius: {
+        roles: [Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
+        resource: Resource.Resources.Metal,
+    },
+    Minerarius: {
+        roles: [Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
+        resource: Resource.Resources.Metal,
+    },
     Runarius: {
-        roles: [Role.RuneCrafter, Role.Alt],
-        crafting: {
-            enabled: true,
-            checkIntervalSeconds: 700
-        }
+        roles: [Role.RuneCrafter, Role.Alt, Role.Dungeoneer],
+        resource: Resource.Resources.Stone,
     },
     Jewelarius: {
-        roles: [Role.JewelCrafter, Role.Alt],
-        crafting: {
-            enabled: true,
-            checkIntervalSeconds: 700
-        }
+        roles: [Role.JewelCrafter, Role.Alt, Role.Dungeoneer],
+        resource: Resource.Resources.Metal,
     },
 }
 
@@ -186,5 +182,5 @@ const findCharsByRole = role => {
 }
 
 if (module) {
-    module.exports = { charSettings, findCharsByRole }
+    module.exports = { charSettings }
 }
