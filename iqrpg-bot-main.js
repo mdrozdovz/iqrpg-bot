@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name            IQRPG-Bot
 // @namespace       http://tampermonkey.net/
-// @version         0.2.0
+// @version         0.1.0
 // @description     try to take over the world!
 // @author          mdrozdovz
-// @match           https://*.avabur.com/game*
-// @match           http://*.avabur.com/game*
+// @match           https://test.iqrpg.com/game*
+// @match           http://test.iqrpg.com/game*
 // @icon            data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @require         https://cdn.jsdelivr.net/gh/lodash/lodash@4.17.4/dist/lodash.min.js
-// @require         https://github.com/mdrozdovz/iqrpg-bot/raw/master/character-settings.js?v=8
+// @require         https://github.com/mdrozdovz/iqrpg-bot/raw/master/character-settings.js?v=10
 // @downloadURL     https://github.com/mdrozdovz/iqrpg-bot/raw/master/iqrpg-bot-main.js
 // @updateURL       https://github.com/mdrozdovz/iqrpg-bot/raw/master/version
 // @grant           GM_info
@@ -23,18 +23,39 @@
     const delay = ms => new Promise(r => setTimeout(r, ms))
 
     const defaultSettings = {
+        inventoryUpdateIntervalSeconds: 900,
+        taskExecutor: {
+            intervalSeconds: 30
+        },
+        labyrinth: {
+            enabled: true,
+            intervalSeconds: 3600
+        },
         resourceWire: {
-            enabled: false,
-            checkIntervalSeconds: 3600,
+            enabled: true,
+            checkIntervalSeconds: 3 * 3600,
             exceedFactor: 1.5,
-            altsFactor: 0.5,
-        }
+            rssAltsFactor: 0.5,
+            goldAltsFactor: 0.75,
+        },
+        alchemistWire: {
+            enabled: true,
+            intervalSeconds: 7200,
+        },
+        runeCrafterWire: {
+            enabled: true,
+            intervalSeconds: 7200,
+        },
+        jewelCrafterWire: {
+            enabled: true,
+            intervalSeconds: 7200,
+        },
     }
 
-    const log = (msg, data) => {
+    const log = (msg, ...data) => {
         const now = new Date()
         const prefix = `[${now.toDateString()} ${now.toTimeString().split(' ')[0]}][IQRPG Bot]:`
-        if (data) console.log(`${prefix} ${msg}`, data)
+        if (data) console.log(`${prefix} ${msg}`, ...data)
         else console.log(`${prefix} ${msg}`)
     }
 
@@ -50,12 +71,6 @@
             if (isVisible(el) && isEnabled(el)) return el
         }
 
-        return null
-    }
-
-    const getCharName = () => {
-        const nameSelector = () => $('td#my_title > a.profileLink')
-        if (nameSelector()) return nameSelector().text
         return null
     }
 
@@ -75,102 +90,122 @@
 
     const buttons = {
         navigation: {
-            inventory: () => $('a[href="/inventory"]'),
+            home: () => $('a[href="/"]'),
+            inventory: () => $('a[href*="inventory"]'),
+            market: () => $('a[href*="market"]'),
+            labyrinth: () => $('a[href*="labyrinth"]'),
         },
         inventory: {
             jewels: () => $('div.menu > a[href="/inventory_jewels"]'),
             trinkets: () => $('div.menu > a[href="/inventory_trinkets"]'),
-            resources: () => $$('div.menu > a:not([href])')
+            resources: () => $$('div.menu > a:not([href])'),
         },
-        mainSection: {
-            view: () => $('div.main-section > a:has([href])')
+        market: {
+            sendItems: () => $('a[href*=send_items]'),
+            confirm: () => $('p > button'),
+            change: () => $('table.table-invisible > tr > td > span > a')
+        },
+        misc: {
+            captchaClose: () => $('div.modal > div.close'),
+            view: () => $('div.main-section>div>div>div>p>a[href]'),
         }
     }
-    const collectResources = async () => {
-        const res = {}
-        await safeClick(buttons.navigation.inventory())
-        const btns = buttons.inventory.resources()
-        for (const group of resourceGroups) {
-            await safeClick(btns.shift())
-            const rows = $$('table.table-invisible > tr')
-            for (const row of rows) {
-                const type = row.children[0].querySelector('p').textContent.replaceAll(/[\[\]]/g, '')
-                const value = parseInt(row.children[1].textContent.replaceAll(',', ''))
-                res[type] = value
-            }
-        }
-        await safeClick(buttons.mainSection.view())
-        return res
+
+    const getCharName = async () => {
+        await safeClick(buttons.navigation.home())
+        const nameSelector = () => $('table.table-invisible > tr:nth-child(1) > td:nth-child(2)')
+        await safeClick(buttons.misc.view())
+        if (nameSelector()) return nameSelector().outerText
+        return null
     }
 
-    const closeModalSelector = () => $('#modalWrapper > div > span.closeModal')
-    const confirmButtonSelector = () => $('#confirmButtons > a.button.green')
-    const cancelButtonSelector = () => $('#confirmButtons > a.button.red')
-    const chatInputSelector = () => $('div#chatMessage')
-    const sendButtonSelector = () => $('input#chatSendMessage')
+    const wireItem = async (recipient, item, quantity) => {
+        if (!quantity || !recipient || !item) return
+        await safeClick(buttons.navigation.market())
+        await safeClick(buttons.market.sendItems())
+        await safeClick(buttons.market.change())
 
-    const executeChatCommand = async cmd => {
-        log('Executing command:', cmd)
-        chatInputSelector().textContent = cmd
-        await safeClick(sendButtonSelector())
+        const rows = [...$$('div.modal__content > table.table-invisible > tr')]
+        const row = rows.find(r => r.querySelector('td > div > div > p').innerText?.includes(item))
+        if (!row) {
+            log('Unable to wire (not found):', item)
+            await safeClick(buttons.misc.captchaClose())
+            await safeClick(buttons.misc.view())
+            return
+        }
+        await safeClick(row.querySelector('td:nth-child(3) > a').click()) // "Select" button
+        const recipientField = $('input[type=text]:not([maxlength])')
+        const quantityField = $('table.table-invisible > tr > td > input[type=text][maxlength]')
+        recipientField.value = recipient
+        quantityField.value = quantity
+        recipientField.dispatchEvent(new Event('input', { bubbles: true }))
+        quantityField.dispatchEvent(new Event('input', { bubbles: true }))
+        await delay(100)
+        await safeClick(buttons.market.confirm())
+        await safeClick(buttons.misc.view())
     }
 
     class IQRPGBot {
         settings
         timers
         eventListeners
+        inventory
+        taskQueue
 
         constructor(defaultSettings, charSettings) {
             const settings = {}
             _.extend(settings, defaultSettings, charSettings)
             this.settings = settings
             this.timers = {}
-            this.eventListeners = {}
+            this.eventListeners = { window: {}}
+            this.inventory = {}
+            this.taskQueue = []
         }
 
-        setupQuestCompletion() {
-            const infoLinkSelector = elem => elem.querySelector('div.center > a.questCenter')
-            const completeButtonSelector = type => $(`input.completeQuest[data-questtype=${type}]`)
-            const jumpFwdButtonSelector = () => $('#roaJumpNextMob')
-            const beginQuestButtonsSelector = type => $(`input.questRequest[data-questtype=${type}]`)
-            const resetStatsSelector = () => $('#clearBattleStats')
-            const winRateSelector = () => $('td#gainsRatio')
+        async processQueue() {
+            let task = this.taskQueue.shift()
+            while (!!task) {
+                log('Processing task:', task.name)
+                await task.exec()
+                log('Processed task:', task.name)
+                task = this.taskQueue.shift()
+            }
+        }
 
-            log('Setting up auto quest completion')
-            return setInterval(async () => {
-                const { elem, type } = getCurrentQuestType()
-                if (!infoLinkSelector(elem)) return
+        async collectInventory() {
+            const res = {}
+            await safeClick(buttons.navigation.inventory())
+            const btns = [...buttons.inventory.resources()]
 
-                log(`Found completed quest. Current quest: ${type}`)
-
-                await safeClick(completeButtonSelector(type))
-                if (type === 'kill') {
-                    if (winRateSelector()?.textContent === '100.00%') {
-                        const { jumpForwardTimes } = this.settings.questCompletion
-                        log(`Jumping mobs ${jumpForwardTimes} times`)
-                        for (let i = 0; i < jumpForwardTimes; i++) {
-                            await safeClick(jumpFwdButtonSelector())
-                        }
-                    }
+            for (const group of resourceGroups) {
+                await safeClick(btns.shift())
+                const rows = $$('table.table-invisible > tr')
+                for (const row of rows) {
+                    const type = row.children[0].querySelector('p').textContent.replaceAll(/[\[\]]/g, '')
+                    const value = parseInt(row.children[1].textContent.replaceAll(',', ''))
+                    res[type] = value
                 }
-                await safeClick(beginQuestButtonsSelector(type))
-                await safeClick(closeModalSelector())
-                await safeClick(resetStatsSelector())
-                log(`Refreshed quest`)
-            }, this.settings.questCompletion.checkIntervalSeconds * 1000)
+            }
+            await safeClick(buttons.misc.view())
+            return res
         }
 
         async wireToMain() {
-            const mainChar = _.first(findCharsByRole(Role.Main))
             if (!this.settings.roles.includes(Role.Alt)) return
+            const mainChar = _.first(findCharsByRole(Role.Main))
 
-            const resData = this.resInfo(false)
+            const resData = this.resInfo()
             if (resData.factor > this.settings.resourceWire.exceedFactor) {
                 const toWire = Math.floor(resData.primaryRss - resData.avg)
-                const mats = resData.rss[Resource.CraftingMaterials]
-                // TODO make universal, filterable
-                const cmd = `/wire ${mainChar} ${toWire} ${resData.type}, ${mats} ${Resource.CraftingMaterials}`
-                await executeChatCommand(cmd)
+                await wireItem(mainChar, this.settings.resource, toWire)
+            }
+            if (this.settings.roles.includes(Role.Battler)) {
+                await wireItem(mainChar, Resource.Currency.Gold, this.inventory[Resource.Currency.Gold])
+                await wireItem(mainChar, Resource.CraftingComponents.ToolComponent, this.inventory[Resource.CraftingComponents.ToolComponent])
+            }
+            if (!this.settings.roles.includes(Role.Dungeoneer)) {
+                for (const key of Object.values(Resource.DungeonKeys))
+                    await wireItem(mainChar, key, this.inventory[key])
             }
         }
 
@@ -178,40 +213,113 @@
             if (!this.settings.roles.includes(Role.Main)) return
 
             const alts = findCharsByRole(Role.Alt)
-            const resInfo = this.resInfo().rss
-            const min = _.min(Object.values(_.omit(resInfo, Resource.CraftingMaterials, Resource.GemFragments)))
-            const toWire = Math.floor(min * this.settings.resourceWire.altsFactor / alts.length)
+            const tsers = findCharsByRole(Role.Tradeskiller)
+            const dungeoneers = findCharsByRole(Role.Dungeoneer)
+            const min = _.min(Object.values(_.pick(this.inventory, Resource.Resources.Wood, Resource.Resources.Metal, Resource.Resources.Stone)))
+            const rssToWire = Math.floor(min * this.settings.resourceWire.rssAltsFactor / alts.length)
+            const goldToWire = Math.floor(this.inventory[Resource.Currency.Gold] * this.settings.resourceWire.goldAltsFactor / alts.length)
 
+            log('Wiring to each alt gold, wood/metal/stone:', goldToWire, rssToWire)
             for (const alt of alts) {
-                let cmd = `/wire ${alt}`
-                for (const type of [Resource.Food, Resource.Wood, Resource.Metal, Resource.Stone]) {
-                    cmd += ` ${toWire} ${type},`
+                for (const type of [Resource.Resources.Wood, Resource.Resources.Metal, Resource.Resources.Stone]) {
+                    await wireItem(alt, type, rssToWire)
                 }
-                if (charSettings[alt].roles.includes(Role.Crafter)) {
-                    cmd += ` ${resInfo[Resource.CraftingMaterials]} ${Resource.CraftingMaterials}`
-                }
-                cmd = cmd.replace(/,$/g, '')
-                await executeChatCommand(cmd)
-                await delay(5000)
+                await wireItem(alt, Resource.Currency.Gold, goldToWire)
             }
+            log('Wiring dungeon keys')
+            for (const dun of dungeoneers)
+                for (const type of Object.values(Resource.DungeonKeys)) {
+                    await wireItem(dun, type, this.inventory[type] / dungeoneers.length)
+                }
+            const tcToWire = this.inventory[Resource.CraftingComponents.ToolComponent] / tsers.length
+            log('Wiring tool components:', tcToWire)
+            for (const tser of tsers)
+                await wireItem(tser, Resource.CraftingComponents.ToolComponent, tcToWire)
+        }
+
+        async wireToAlchemist() {
+            if (this.settings.roles.includes(Role.Alchemist)) return
+            const alch = _.first(findCharsByRole(Role.Alchemist))
+
+            for (const ingr of Object.values(Resource.AlchemyIngredients))
+                await wireItem(alch, ingr, this.inventory[ingr])
+        }
+
+        async wireToRuneCrafter() {
+            if (this.settings.roles.includes(Role.RuneCrafter)) return
+            const rc = _.first(findCharsByRole(Role.RuneCrafter))
+
+            for (const stone of Object.values(Resource.Stones))
+                await wireItem(rc, stone, this.inventory[stone])
+        }
+
+        async wireToJewelCrafter() {
+            if (this.settings.roles.includes(Role.JewelCrafter)) return
+            const jc = _.first(findCharsByRole(Role.JewelCrafter))
+
+            for (const gem of Object.values(Resource.Gems).concat(Resource.CraftingComponents.GemFragments))
+                await wireItem(jc, gem, this.inventory[gem])
+        }
+
+        setupTaskExecutor() {
+            return setInterval(this.processQueue.bind(this), this.settings.taskExecutor.intervalSeconds * 1000)
+        }
+        setupInventoryUpdate() {
+            const task = {
+                name: 'Inventory update',
+                exec: async () => this.inventory = await this.collectInventory()
+            }
+            return setInterval(this.taskQueue.push(task), this.settings.inventoryUpdateIntervalSeconds * 1000)
         }
 
         setupResourceWire() {
-            return setInterval(this.wireToMain.bind(this), this.settings.resourceWire.checkIntervalSeconds * 1000)
+            const task = {
+                name: 'Resource wire',
+                exec: this.wireToMain.bind(this)
+            }
+            return setInterval(this.taskQueue.push(task), this.settings.resourceWire.checkIntervalSeconds * 1000)
         }
 
-        async resInfo() {
-            const rss = await collectResources()
-            /*const type = this.settings.resource
+        setupAlchemistWire() {
+            const task = {
+                name: 'Alchemist wire',
+                exec: this.wireToAlchemist.bind(this)
+            }
+            return setInterval(this.taskQueue.push(task), this.settings.alchemistWire.checkIntervalSeconds * 1000)
+        }
+
+        setupRuneCrafterWire() {
+            const task = {
+                name: 'RuneCrafter wire',
+                exec: this.wireToRuneCrafter.bind(this)
+            }
+            return setInterval(this.taskQueue.push(task), this.settings.runeCrafterWire.checkIntervalSeconds * 1000)
+        }
+
+        setupJewelCrafterWire() {
+            const task = {
+                name: 'JewelCrafter wire',
+                exec: this.wireToJewelCrafter.bind(this)
+            }
+            return setInterval(this.taskQueue.push(task), this.settings.jewelCrafterWire.checkIntervalSeconds * 1000)
+        }
+
+        resInfo() {
+            const type = this.settings.resource
             if (type) {
-                const avg = _.sum(Object.values(_.omit(rss, Resource.CraftingMaterials, Resource.GemFragments))) / 4
-                const primaryRss = rss[type]
+                const avg = _.sum(Object.values(
+                    _.pick(this.inventory, Resource.Resources.Wood, Resource.Resources.Metal, Resource.Resources.Stone)
+                )) / 3
+                const primaryRss = this.inventory[type]
                 const factor = primaryRss / avg
-                return { type, primaryRss, avg, factor, rss }
+                return { type, primaryRss, avg, factor }
             } else {
-                return { type, primaryRss: 0, avg: 0, factor: 1, rss }
-            }*/
-            console.log(rss)
+                return { type, primaryRss: 0, avg: 0, factor: 1 }
+            }
+        }
+
+        async wireItem(recipient, item, quantity) {
+            return wireItem(recipient, item, quantity)
         }
 
         attachKeyBinds() {
@@ -233,8 +341,6 @@
         }
 
         miscellaneous() {
-            $('#areaContent').style.height = '440px'
-            $('#chatMessageListWrapper').style.height = '510px'
             setTimeout(() => $('#close_general_notification').click(), 5000)
         }
 
@@ -244,14 +350,20 @@
             }
         }
 
-        start() {
+        async start() {
             log('Starting IQRPG Bot with settings:', this.settings)
 
-            if (this.settings.questCompletion?.enabled) this.timers.questCompletion = this.setupQuestCompletion()
-            if (this.settings.resourceWire?.enabled) this.timers.resourceWire = this.setupResourceWire()
-            this.attachKeyBinds()
-            this.miscellaneous()
 
+            log('Collecting inventory')
+            this.inventory = await this.collectInventory()
+            this.timers.inventoryUpdate = this.setupInventoryUpdate()
+            this.timers.taskExecutor = this.setupTaskExecutor()
+            if (this.settings.resourceWire?.enabled) this.timers.resourceWire = this.setupResourceWire()
+            if (this.settings.alchemistWire?.enabled) this.timers.alchemistWire = this.setupAlchemistWire()
+            if (this.settings.runeCrafterWire?.enabled) this.timers.runeCrafterWire = this.setupRuneCrafterWire()
+            if (this.settings.jewelCrafterWire?.enabled) this.timers.jewelCrafterWire = this.setupJewelCrafterWire()
+            // this.attachKeyBinds()
+            // this.miscellaneous()
             this.printTimers()
         }
 
@@ -261,6 +373,8 @@
                 clearInterval(val)
             }
             this.timers = {}
+            this.inventory = {}
+            this.taskQueue = []
 
             for (const [key, val] of Object.entries(this.eventListeners.window)) {
                 window.removeEventListener(key, val)
@@ -274,7 +388,9 @@
         }
     }
 
-    unsafeWindow.bot = new IQRPGBot(defaultSettings, charSettings[getCharName()])
+    const charName = await getCharName()
+    log('Character:', charName)
+    unsafeWindow.bot = new IQRPGBot(defaultSettings, charSettings[charName])
     unsafeWindow.addEventListener('beforeunload', () => unsafeWindow.bot.stop())
     unsafeWindow.bot.start()
 })()
