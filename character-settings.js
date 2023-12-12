@@ -379,7 +379,10 @@
         setupRefresh() {
             const task = {
                 name: 'Refresh',
-                exec: () => safeClick($('div.action-timer__text')),
+                exec: async () => {
+                    await safeClick($('div.action-timer__text'))
+                    await safeClick(buttons.misc.captchaClose())
+                },
             }
             return setInterval(() => this.taskQueue.push(task), 120 * 1000)
         }
