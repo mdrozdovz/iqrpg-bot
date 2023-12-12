@@ -376,6 +376,17 @@
             return setInterval(() => this.taskQueue.push(task), this.settings.raids.intervalSeconds * 1000)
         }
 
+        setupRefresh() {
+            const task = {
+                name: 'Refresh',
+                exec: async () => {
+                    await safeClick($('div.action-timer__text'))
+                    await safeClick(buttons.misc.captchaClose())
+                },
+            }
+            return setInterval(() => this.taskQueue.push(task), 600 * 1000)
+        }
+
         resInfo() {
             const type = this.settings.resource
             if (type) {
@@ -436,6 +447,7 @@
             if (this.settings.jewelCrafterWire?.enabled) this.timers.jewelCrafterWire = this.setupJewelCrafterWire()
             if (this.settings.labyrinth?.enabled) this.timers.labyrinth = this.setupLabyrinth()
             if (this.settings.raids?.enabled) this.timers.raids = this.setupRaids()
+            this.timers.refresh = this.setupRefresh()
             // this.attachKeyBinds()
             // this.miscellaneous()
             this.printTimers()
