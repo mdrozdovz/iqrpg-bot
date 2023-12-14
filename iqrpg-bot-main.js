@@ -447,7 +447,7 @@
             if (this.settings.jewelCrafterWire?.enabled) this.timers.jewelCrafterWire = this.setupJewelCrafterWire()
             if (this.settings.labyrinth?.enabled) this.timers.labyrinth = this.setupLabyrinth()
             if (this.settings.raids?.enabled) this.timers.raids = this.setupRaids()
-            this.timers.refresh = this.setupRefresh()
+            // this.timers.refresh = this.setupRefresh()
             // this.attachKeyBinds()
             // this.miscellaneous()
             this.printTimers()
