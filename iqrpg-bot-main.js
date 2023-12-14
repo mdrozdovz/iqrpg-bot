@@ -294,7 +294,7 @@
                 await safeClick($('div.main-section__body > div > div > button')) // Claim rewards
                 await safeClick($('div.main-section__body > div > div > a:not([href])')) // Close window
             }, 150 * 1000)
-            await safeClick(buttons.misc.view())
+            //await safeClick(buttons.misc.view())
         }
 
         async runRaid() {
