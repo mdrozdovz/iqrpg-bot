@@ -21,6 +21,7 @@
     const $ = document.querySelector.bind(document)
     const $$ = document.querySelectorAll.bind(document)
     const delay = ms => new Promise(r => setTimeout(r, ms))
+    const numberFormat = new Intl.NumberFormat('en-US', { useGrouping: true })
 
     const defaultSettings = {
         inventoryUpdate: {
@@ -240,7 +241,7 @@
             const rssToWire = Math.floor(min * this.settings.resourceWire.rssAltsFactor / alts.length)
             const goldToWire = Math.floor(this.inventory[Resource.Currency.Gold] * this.settings.resourceWire.goldAltsFactor / alts.length)
 
-            log('Wiring to each alt gold, wood/metal/stone:', goldToWire, rssToWire)
+            log(`Wiring to each alt ${numberFormat.format(goldToWire)} gold, ${numberFormat.format(rssToWire)} wood/metal/stone:`)
             for (const alt of alts) {
                 for (const type of [Resource.Resources.Wood, Resource.Resources.Metal, Resource.Resources.Stone]) {
                     await wireItem(alt, type, rssToWire)
