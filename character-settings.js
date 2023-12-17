@@ -195,6 +195,7 @@ const charSettings = {
         resource: Resource.Resources.Stone,
         labyrinth: {
             enabled: true,
+            intervalSeconds: 3600,
         },
     },
     Jewelarius: {
@@ -202,6 +203,7 @@ const charSettings = {
         resource: Resource.Resources.Metal,
         labyrinth: {
             enabled: true,
+            intervalSeconds: 3600,
         },
     },
 }
