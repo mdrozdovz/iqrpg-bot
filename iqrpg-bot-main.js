@@ -22,6 +22,7 @@
     const $$ = document.querySelectorAll.bind(document)
     const delay = ms => new Promise(r => setTimeout(r, ms))
     const numberFormat = new Intl.NumberFormat('en-US', { useGrouping: true })
+    const debugLogs = false
 
     const defaultSettings = {
         inventoryUpdate: {
@@ -57,6 +58,13 @@
             enabled: true,
             intervalSeconds: 3600
         },
+    }
+
+    const debug = (msg, ...data) => {
+        if (!debugLogs) return
+        const now = new Date()
+        const prefix = `[${now.toDateString()} ${now.toTimeString().split(' ')[0]}][IQRPG Bot]:`
+        console.debug(`${prefix} ${msg}`, ...data)
     }
 
     const log = (msg, ...data) => {
@@ -249,13 +257,13 @@
                 await wireItem(alt, Resource.Currency.Gold, goldToWire)
             }
 
-            log('Wiring dungeon keys')
+            /*log('Wiring dungeon keys')
             for (const dun of dungeoneers) {
                 for (const type of Object.values(Resource.DungeonKeys)) {
                     const keysToWire = Math.floor(this.inventory[type] / dungeoneers.length)
                     await wireItem(dun, type, keysToWire)
                 }
-            }
+            }*/
 
             const tcToWire = Math.floor(this.inventory[Resource.CraftingComponents.ToolComponent] / tsers.length)
             log('Wiring tool components:', tcToWire)
@@ -305,14 +313,20 @@
             const rows = [...$$('table.table-invisible > tr')]
             const row = rows[1]
             const btn = row.querySelector('td:nth-child(2) > div > a')
+            debug('rewards button', btn)
             if (btn && btn.innerText !== 'Get Rewards') {
                 await safeClick(buttons.misc.view())
+                debug('returning')
                 return
             }
             await safeClick(btn)
+            debug('got rewards')
 
             const raidsTable = _.last([...$$('table.table-invisible')])
             const raidBtn = _.last([... raidsTable.querySelectorAll('tr')])?.querySelector('td > a')
+            debug('raids table', raidsTable)
+            debug('raid button', raidBtn)
+            debug('view button', buttons.misc.view())
             await safeClick(raidBtn)
             await safeClick(buttons.misc.view())
         }
