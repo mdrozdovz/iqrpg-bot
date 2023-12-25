@@ -1,6 +1,7 @@
 'use strict'
 
 class Role {
+    static All = 'all'
     static Battler = 'battler'
     static Tradeskiller = 'tradeskiller'
     static Woodcutter = 'woodcutter'
@@ -108,90 +109,90 @@ class Resource {
 }
 
 const charSettings = {
-    Arius: { roles: [Role.Battler, Role.Main, Role.Dungeoneer], },
-    Battlarius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
-    Killarius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
-    Huntarius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
-    Gladiarius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
-    Mercenarius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
-    Wararius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
-    Legionarius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
-    Lancarius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
-    Knightarius: { roles: [Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Arius: { roles: [Role.All, Role.Battler, Role.Main, Role.Dungeoneer], },
+    Battlarius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Killarius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Huntarius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Gladiarius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Mercenarius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Wararius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Legionarius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Lancarius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
+    Knightarius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
     Wooarius: {
-        roles: [Role.Tradeskiller, Role.Woodcutter, Role.Alchemist, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Woodcutter, Role.Alchemist, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Wood,
     },
     Woodarius: {
-        roles: [Role.Tradeskiller, Role.Woodcutter, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Woodcutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Wood,
     },
     Choparius: {
-        roles: [Role.Tradeskiller, Role.Woodcutter, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Woodcutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Wood,
     },
     Lumberarius: {
-        roles: [Role.Tradeskiller, Role.Woodcutter, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Woodcutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Wood,
     },
     Logarius: {
-        roles: [Role.Tradeskiller, Role.Woodcutter, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Woodcutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Wood,
     },
     Timberarius: {
-        roles: [Role.Tradeskiller, Role.Woodcutter, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Woodcutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Wood,
     },
     Stonarius: {
-        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Stone,
     },
     Quararius: {
-        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Stone,
     },
     Rockarius: {
-        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Stone,
     },
     Bouldarius: {
-        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Stone,
     },
     Brickarius: {
-        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Stone,
     },
     Masonarius: {
-        roles: [Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Stonecutter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Stone,
     },
     Minarius: {
-        roles: [Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Metal,
     },
     Metalarius: {
-        roles: [Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Metal,
     },
     Gemarius: {
-        roles: [Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Metal,
     },
     Minerarius: {
-        roles: [Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Metal,
     },
     Dredgarius: {
-        roles: [Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Metal,
     },
     Prospectarius: {
-        roles: [Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Metal,
     },
     Runarius: {
-        roles: [Role.RuneCrafter, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.RuneCrafter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Stone,
         labyrinth: {
             enabled: true,
@@ -199,7 +200,7 @@ const charSettings = {
         },
     },
     Jewelarius: {
-        roles: [Role.JewelCrafter, Role.Alt, Role.Dungeoneer],
+        roles: [Role.All, Role.JewelCrafter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Metal,
         labyrinth: {
             enabled: true,
