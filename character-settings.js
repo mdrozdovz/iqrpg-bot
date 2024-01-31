@@ -195,7 +195,7 @@ const charSettings = {
         roles: [Role.All, Role.RuneCrafter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Stone,
         labyrinth: {
-            enabled: true,
+            enabled: false,
             intervalSeconds: 3600,
         },
     },
@@ -203,7 +203,7 @@ const charSettings = {
         roles: [Role.All, Role.JewelCrafter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Metal,
         labyrinth: {
-            enabled: true,
+            enabled: false,
             intervalSeconds: 3600,
         },
     },
