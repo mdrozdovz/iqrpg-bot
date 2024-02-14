@@ -207,6 +207,14 @@ const charSettings = {
             intervalSeconds: 3600,
         },
     },
+    Dungarius: {
+        roles: [Role.All, Role.Alt, Role.Dungeoneer],
+        resource: Resource.Resources.Wood,
+        labyrinth: {
+            enabled: false,
+            intervalSeconds: 3600,
+        },
+    },
 }
 
 const findCharsByRole = role => {
