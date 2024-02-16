@@ -211,7 +211,7 @@ const charSettings = {
         roles: [Role.All, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Wood,
         labyrinth: {
-            enabled: true,
+            enabled: false,
             intervalSeconds: 3600,
         },
     },
