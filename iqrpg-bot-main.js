@@ -60,7 +60,7 @@
         },
         raids: {
             enabled: true,
-            intervalSeconds: 3600
+            intervalSeconds: 3610
         },
     }
 
