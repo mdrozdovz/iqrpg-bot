@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            IQRPG-Bot
 // @namespace       http://tampermonkey.net/
-// @version         0.1.2
+// @version         0.1.3
 // @description     try to take over the world!
 // @author          mdrozdovz
 // @match           https://test.iqrpg.com/game*
