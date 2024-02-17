@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            IQRPG-Bot
 // @namespace       http://tampermonkey.net/
-// @version         0.1.0
+// @version         0.1.2
 // @description     try to take over the world!
 // @author          mdrozdovz
 // @match           https://test.iqrpg.com/game*
@@ -49,6 +49,10 @@
         jewelCrafterWire: {
             enabled: true,
             intervalSeconds: 2 * 3600,
+        },
+        dungeoneerWire: {
+            enabled: true,
+            intervalSeconds: 4 * 3600,
         },
         labyrinth: {
             enabled: true,
@@ -257,13 +261,15 @@
                 await wireItem(alt, Resource.Currency.Gold, goldToWire)
             }
 
-            /*log('Wiring dungeon keys')
+            /*
+            log('Wiring dungeon keys')
             for (const dun of dungeoneers) {
                 for (const type of Object.values(Resource.DungeonKeys)) {
                     const keysToWire = Math.floor(this.inventory[type] / dungeoneers.length)
                     await wireItem(dun, type, keysToWire)
                 }
-            }*/
+            }
+            */
 
             const tcToWire = Math.floor(this.inventory[Resource.CraftingComponents.ToolComponent] / tsers.length)
             log('Wiring tool components:', tcToWire)
@@ -293,6 +299,18 @@
 
             for (const gem of Object.values(Resource.Gems).concat(Resource.CraftingComponents.GemFragments))
                 await wireItem(jc, gem, this.inventory[gem])
+        }
+
+        async wireToDungeoneer() {
+            if (this.settings.roles.includes(Role.Dungeoneer)) return
+                        
+            const dungeoneers = findCharsByRole(Role.Dungeoneer)
+            for (const dun of dungeoneers) {
+                for (const type of Object.values(Resource.DungeonKeys)) {
+                    const keysToWire = Math.floor(this.inventory[type] / dungeoneers.length)
+                    await wireItem(dun, type, keysToWire)
+                }
+            }
         }
 
         async runLabyrinth() {
@@ -373,6 +391,14 @@
                 exec: this.wireToJewelCrafter.bind(this)
             }
             return setInterval(() => this.taskQueue.push(task), this.settings.jewelCrafterWire.intervalSeconds * 1000)
+        }
+
+        setupDungeoneerWire() {
+            const task = {
+                name: 'Dungeoneer wire',
+                exec: this.wireToDungeoneer.bind(this)
+            }
+            return setInterval(() => this.taskQueue.push(task), this.settings.dungeoneerWire.intervalSeconds * 1000)
         }
 
         setupLabyrinth() {
@@ -460,6 +486,7 @@
             if (this.settings.alchemistWire?.enabled) this.timers.alchemistWire = this.setupAlchemistWire()
             if (this.settings.runeCrafterWire?.enabled) this.timers.runeCrafterWire = this.setupRuneCrafterWire()
             if (this.settings.jewelCrafterWire?.enabled) this.timers.jewelCrafterWire = this.setupJewelCrafterWire()
+            if (this.settings.dungeoneerWire?.enabled) this.timers.dungeoneerWire = this.setupDungeoneerWire()
             if (this.settings.labyrinth?.enabled) this.timers.labyrinth = this.setupLabyrinth()
             if (this.settings.raids?.enabled) this.timers.raids = this.setupRaids()
             // this.timers.refresh = this.setupRefresh()
