@@ -35,8 +35,8 @@
             enabled: true,
             intervalSeconds: 3 * 3600,
             exceedFactor: 1.5,
-            rssAltsFactor: 0.5,
-            goldAltsFactor: 0.75,
+            rssAltsFactor: 0.9,
+            goldAltsFactor: 0.9,
         },
         alchemistWire: {
             enabled: true,
