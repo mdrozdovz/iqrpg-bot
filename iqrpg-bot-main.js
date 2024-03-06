@@ -241,6 +241,7 @@
                 for (const key of Object.values(Resource.DungeonKeys))
                     await wireItem(mainChar, key, this.inventory[key])
             }
+            await wireItem(mainChar, Resource.Misc.ResourceCache, this.inventory[Resource.Misc.ResourceCache])
         }
 
         async wireToAlts() {
@@ -303,7 +304,7 @@
 
         async wireToDungeoneer() {
             if (this.settings.roles.includes(Role.Dungeoneer)) return
-                        
+
             const dungeoneers = findCharsByRole(Role.Dungeoneer)
             for (const dun of dungeoneers) {
                 for (const type of Object.values(Resource.DungeonKeys)) {
@@ -332,11 +333,11 @@
             const row = rows[1]
             const btn = row.querySelector('td:nth-child(2) > div > a')
             debug('rewards button', btn)
-            if (btn && btn.innerText !== 'Get Rewards') {
+            /*if (btn && btn.innerText !== 'Get Rewards') {
                 await safeClick(buttons.misc.view())
                 debug('returning')
                 return
-            }
+            }*/
             await safeClick(btn)
             debug('got rewards')
 
