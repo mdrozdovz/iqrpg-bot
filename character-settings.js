@@ -109,16 +109,78 @@ class Resource {
 }
 
 const charSettings = {
-    Arius: { roles: [Role.All, Role.Battler, Role.Main, Role.Dungeoneer], },
-    Battlarius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
-    Killarius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
-    Huntarius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
-    Gladiarius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
-    Mercenarius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
-    Wararius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
-    Legionarius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
-    Lancarius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
-    Knightarius: { roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], },
+    // BATTLERS
+    Arius: { 
+        roles: [Role.All, Role.Battler, Role.Main, Role.Dungeoneer], 
+        abyss: {
+            enabled: true,
+            intervalSeconds: 3600
+        },
+    },
+    Battlarius: { 
+        roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], 
+        abyss: {
+            enabled: true,
+            intervalSeconds: 3600
+        },
+    },
+    Killarius: { 
+        roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], 
+        abyss: {
+            enabled: true,
+            intervalSeconds: 3600
+        },
+    },
+    Huntarius: { 
+        roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], 
+        abyss: {
+            enabled: true,
+            intervalSeconds: 3600
+        },
+    },
+    Gladiarius: { 
+        roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], 
+        abyss: {
+            enabled: true,
+            intervalSeconds: 3600
+        },
+    },
+    Mercenarius: { 
+        roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], 
+        abyss: {
+            enabled: true,
+            intervalSeconds: 3600
+        },
+    },
+    Wararius: { 
+        roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], 
+        abyss: {
+            enabled: true,
+            intervalSeconds: 3600
+        },
+    },
+    Legionarius: { 
+        roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], 
+        abyss: {
+            enabled: true,
+            intervalSeconds: 3600
+        },
+    },
+    Lancarius: { 
+        roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], 
+        abyss: {
+            enabled: true,
+            intervalSeconds: 3600
+        },
+    },
+    Knightarius: { 
+        roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], 
+        abyss: {
+            enabled: true,
+            intervalSeconds: 3600
+        },
+    },
+    // TSERS
     Wooarius: {
         roles: [Role.All, Role.Tradeskiller, Role.Woodcutter, Role.Alchemist, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Wood,
@@ -191,6 +253,7 @@ const charSettings = {
         roles: [Role.All, Role.Tradeskiller, Role.Miner, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Metal,
     },
+    // CRAFTERS
     Runarius: {
         roles: [Role.All, Role.RuneCrafter, Role.Alt, Role.Dungeoneer],
         resource: Resource.Resources.Stone,
