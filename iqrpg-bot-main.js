@@ -8,7 +8,7 @@
 // @match           http://test.iqrpg.com/game*
 // @icon            data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @require         https://cdn.jsdelivr.net/gh/lodash/lodash@4.17.4/dist/lodash.min.js
-// @require         https://github.com/mdrozdovz/iqrpg-bot/raw/master/character-settings.js?v=2
+// @require         https://github.com/mdrozdovz/iqrpg-bot/raw/master/character-settings.js?v=1
 // @downloadURL     https://github.com/mdrozdovz/iqrpg-bot/raw/master/iqrpg-bot-main.js
 // @updateURL       https://github.com/mdrozdovz/iqrpg-bot/raw/master/version
 // @grant           GM_info
@@ -22,7 +22,7 @@
     const $$ = document.querySelectorAll.bind(document)
     const delay = ms => new Promise(r => setTimeout(r, ms))
     const numberFormat = new Intl.NumberFormat('en-US', { useGrouping: true })
-    const debugLogs = false
+    const debugLogs = true
 
     const defaultSettings = {
         inventoryUpdate: {
@@ -60,7 +60,11 @@
         },
         raids: {
             enabled: true,
-            intervalSeconds: 3610
+            intervalSeconds: 3625
+        },
+        abyss: {
+            enabled: false,
+            intervalSeconds: 3600
         },
     }
 
@@ -117,6 +121,7 @@
             home: () => $('a[href="/"]'),
             inventory: () => $('a[href*="inventory"]'),
             market: () => $('a[href*="market"]'),
+            battling: () => $('a[href*="areas"]'),
             labyrinth: () => $('a[href*="labyrinth"]'),
             land: () => $('a[href*="land"]'),
         },
@@ -130,6 +135,9 @@
             confirm: () => $('p > button'),
             change: () => $('table.table-invisible > tr > td > span > a')
         },
+        battling: {
+            abyss: () => _.last($$('div.accordian > div.accordian__item.clickable'))
+        },
         land: {
             personnel: () => $('a[href*=personnel]'),
             raids: () => $('a[href*=raids]'),
@@ -138,6 +146,7 @@
         misc: {
             captchaClose: () => $('div.modal > div.close'),
             view: () => $('div.main-section>div>div>div>p>a[href]'),
+            currentAction: () => $('div.progress__text'),
         }
     }
 
@@ -175,12 +184,25 @@
         await safeClick(buttons.misc.view())
     }
 
+    const awaitCompletion = async (task, timeout = 60000) =>
+        Promise.race([
+            new Promise(async r => {
+                while (true) {
+                    if (unsafeWindow.bot.completed[task]) return r()
+                    log('awaiting')
+                    await delay(1000)
+                }
+            }),
+            delay(timeout).then(() => Promise.reject(`Awaiting completion of ${task} timed out after ${timeout}ms`))
+        ])
+
     class IQRPGBot {
         settings
         timers
         eventListeners
         inventory
         taskQueue
+        completed
 
         constructor(defaultSettings, charSettings) {
             const settings = {}
@@ -190,14 +212,18 @@
             this.eventListeners = { window: {}}
             this.inventory = {}
             this.taskQueue = []
+            this.completed = {}
         }
 
         async processQueue() {
             let task = this.taskQueue.shift()
             while (!!task) {
                 log('Processing task:', task.name)
+                this.completed[task.name] = false
                 await task.exec()
                 log('Processed task:', task.name)
+                this.completed[task.name] = true
+                await delay(1000)
                 task = this.taskQueue.shift()
             }
         }
@@ -241,7 +267,6 @@
                 for (const key of Object.values(Resource.DungeonKeys))
                     await wireItem(mainChar, key, this.inventory[key])
             }
-            await wireItem(mainChar, Resource.Misc.ResourceCache, this.inventory[Resource.Misc.ResourceCache])
         }
 
         async wireToAlts() {
@@ -261,16 +286,6 @@
                 }
                 await wireItem(alt, Resource.Currency.Gold, goldToWire)
             }
-
-            /*
-            log('Wiring dungeon keys')
-            for (const dun of dungeoneers) {
-                for (const type of Object.values(Resource.DungeonKeys)) {
-                    const keysToWire = Math.floor(this.inventory[type] / dungeoneers.length)
-                    await wireItem(dun, type, keysToWire)
-                }
-            }
-            */
 
             const tcToWire = Math.floor(this.inventory[Resource.CraftingComponents.ToolComponent] / tsers.length)
             log('Wiring tool components:', tcToWire)
@@ -315,14 +330,28 @@
         }
 
         async runLabyrinth() {
+            const currAction = buttons.misc.currentAction().innerText
+            if (/(dungeoneering|alchemy)/ig.test(currAction)) {
+                log('Dungeon is in progress, skipping Labyrinth')
+                return
+            }
+
             await safeClick(buttons.navigation.labyrinth())
             await safeClick($('button'))
             await safeClick(buttons.misc.captchaClose())
+            setTimeout(() => this.completed.Labyrinth = false, 1000)
             this.timers.labyrinthReward = setTimeout(async () => {
                 await safeClick($('div.main-section__body > div > div > button')) // Claim rewards
                 await safeClick($('div.main-section__body > div > div > a:not([href])')) // Close window
+                this.completed.Labyrinth = true
+                if (this.settings.abyss?.enabled) {
+                    const task = {
+                        name: 'Abyss',
+                        exec: this.runAbyss.bind(this)
+                    }
+                    this.taskQueue.push(task)
+                }
             }, 150 * 1000)
-            //await safeClick(buttons.misc.view())
         }
 
         async runRaid() {
@@ -333,11 +362,11 @@
             const row = rows[1]
             const btn = row.querySelector('td:nth-child(2) > div > a')
             debug('rewards button', btn)
-            /*if (btn && btn.innerText !== 'Get Rewards') {
+            if (btn && btn.innerText !== 'Get Rewards') {
                 await safeClick(buttons.misc.view())
                 debug('returning')
                 return
-            }*/
+            }
             await safeClick(btn)
             debug('got rewards')
 
@@ -348,6 +377,22 @@
             debug('view button', buttons.misc.view())
             await safeClick(raidBtn)
             await safeClick(buttons.misc.view())
+        }
+
+        async runAbyss() {
+            await awaitCompletion('Labyrinth', 160_000)
+            await safeClick(buttons.navigation.battling())
+            const currentPower = Number.parseInt($('td > a.activeText').parentElement.parentElement.childNodes[1].innerText.replaceAll(',', ''))
+
+            await safeClick(buttons.battling.abyss())
+            const abyssMobElems = Array.from($$('table.table-invisible > tr > td')).slice(0, 88) // 44 mobs
+            const abyssMobs = abyssMobElems.map(e => e.innerText.replaceAll(',', '')).map(v => Number(v) || v)
+            const selectedIdx = abyssMobs.findLastIndex(e => Number.isInteger(e) && e <= currentPower)
+            if (selectedIdx > 0) {
+                const mobElemIdx = selectedIdx - 1
+                await safeClick(abyssMobElems[mobElemIdx].childNodes[0])
+                await safeClick(buttons.misc.captchaClose())
+            }
         }
 
         setupTaskExecutor() {
@@ -418,6 +463,14 @@
             return setInterval(() => this.taskQueue.push(task), this.settings.raids.intervalSeconds * 1000)
         }
 
+        setupAbyss() {
+            const task = {
+                name: 'Abyss',
+                exec: this.runAbyss.bind(this)
+            }
+            return setInterval(() => this.taskQueue.push(task), this.settings.abyss.intervalSeconds * 1000)
+        }
+
         setupRefresh() {
             const task = {
                 name: 'Refresh',
@@ -447,28 +500,6 @@
             return wireItem(recipient, item, quantity)
         }
 
-        attachKeyBinds() {
-            log('Setting up custom key binds')
-            const keyDown = e => {
-                const key = e.key
-                switch (key) {
-                    case 'Enter':
-                        safeClick(confirmButtonSelector())
-                        break
-                    case 'Escape':
-                        safeClick(cancelButtonSelector())
-                        break
-                }
-            }
-            window.addEventListener('keydown', keyDown)
-            if (!this.eventListeners.window) this.eventListeners.window = {}
-            this.eventListeners.window.keydown = keyDown
-        }
-
-        miscellaneous() {
-            setTimeout(() => $('#close_general_notification').click(), 5000)
-        }
-
         printTimers() {
             for (const [key, val] of Object.entries(this.timers)) {
                 log(`timers.${key}: ${val}`)
@@ -490,9 +521,8 @@
             if (this.settings.dungeoneerWire?.enabled) this.timers.dungeoneerWire = this.setupDungeoneerWire()
             if (this.settings.labyrinth?.enabled) this.timers.labyrinth = this.setupLabyrinth()
             if (this.settings.raids?.enabled) this.timers.raids = this.setupRaids()
+            //if (this.settings.abyss?.enabled) this.timers.abyss = this.setupAbyss()
             // this.timers.refresh = this.setupRefresh()
-            // this.attachKeyBinds()
-            // this.miscellaneous()
             this.printTimers()
         }
 
@@ -505,6 +535,7 @@
             this.timers = {}
             this.inventory = {}
             this.taskQueue = []
+            this.completed = {}
 
             for (const [key, val] of Object.entries(this.eventListeners.window)) {
                 window.removeEventListener(key, val)
