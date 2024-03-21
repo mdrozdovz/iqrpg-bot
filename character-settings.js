@@ -180,6 +180,13 @@ const charSettings = {
             intervalSeconds: 3600
         },
     },
+    ['OG Arius']: { 
+        roles: [Role.All, Role.Battler, Role.Alt, Role.Dungeoneer], 
+        abyss: {
+            enabled: true,
+            intervalSeconds: 3600
+        },
+    },
     // TSERS
     Wooarius: {
         roles: [Role.All, Role.Tradeskiller, Role.Woodcutter, Role.Alchemist, Role.Alt, Role.Dungeoneer],
