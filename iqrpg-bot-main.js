@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            IQRPG-Bot
 // @namespace       http://tampermonkey.net/
-// @version         0.1.3
+// @version         0.1.4
 // @description     try to take over the world!
 // @author          mdrozdovz
 // @match           https://test.iqrpg.com/game*
@@ -35,8 +35,8 @@
             enabled: true,
             intervalSeconds: 3 * 3600,
             exceedFactor: 1.5,
-            rssAltsFactor: 0.9,
-            goldAltsFactor: 0.9,
+            rssAltsFactor: 1,
+            goldAltsFactor: 1,
         },
         alchemistWire: {
             enabled: true,
@@ -65,6 +65,11 @@
         abyss: {
             enabled: false,
             intervalSeconds: 3600
+        },
+        trinkets: {
+            enabled: true,
+            intervalSeconds: 12 * 3600,
+            keepRarity: Rarity.Mythic,
         },
     }
 
@@ -247,6 +252,7 @@
                 }
             }
             await safeClick(buttons.misc.view())
+            this.inventory = res
             return res
         }
 
@@ -387,11 +393,27 @@
             await safeClick(buttons.battling.abyss())
             const abyssMobElems = Array.from($$('table.table-invisible > tr > td')).slice(0, 88) // 44 mobs
             const abyssMobs = abyssMobElems.map(e => e.innerText.replaceAll(',', '')).map(v => Number(v) || v)
-            const selectedIdx = abyssMobs.findLastIndex(e => Number.isInteger(e) && e <= currentPower)
+            const selectedIdx = abyssMobs.findLastIndex(e => Number.isInteger(e) && currentPower >= e * 0.95)
             if (selectedIdx > 0) {
                 const mobElemIdx = selectedIdx - 1
                 await safeClick(abyssMobElems[mobElemIdx].childNodes[0])
                 await safeClick(buttons.misc.captchaClose())
+            }
+        }
+
+        async destroyTrinkets() {
+            await safeClick(buttons.navigation.inventory())
+            await safeClick(buttons.inventory.trinkets())
+            const trinkets = Array.from($$('table.table-invisible > tr')).slice(6).filter(row => row.querySelectorAll('td').length === 5).slice(1)
+            for (const trinket of trinkets) {
+                const className = trinket.querySelector('td:nth-child(1) > div > div > p').className
+                const rarity = Number(className.split('-')[2])
+                if (rarity < this.settings.trinkets.keepRarity) {
+                    const destroyBtn = trinket.querySelector('td:nth-child(5) > a')
+                    await safeClick(destroyBtn)
+                    const confirmBtn = trinket.querySelector('td:nth-child(5) > a')
+                    await safeClick(confirmBtn)
+                }
             }
         }
 
@@ -402,7 +424,7 @@
         setupInventoryUpdate() {
             const task = {
                 name: 'Inventory update',
-                exec: async () => this.inventory = await this.collectInventory()
+                exec: this.collectInventory.bind(this)
             }
             return setInterval(() => this.taskQueue.push(task), this.settings.inventoryUpdate.intervalSeconds * 1000)
         }
@@ -471,6 +493,14 @@
             return setInterval(() => this.taskQueue.push(task), this.settings.abyss.intervalSeconds * 1000)
         }
 
+        setupTrinkets() {
+            const task = {
+                name: 'Trinkets',
+                exec: this.destroyTrinkets.bind(this)
+            }
+            return setInterval(() => this.taskQueue.push(task), this.settings.trinkets.intervalSeconds * 1000)
+        }
+
         setupRefresh() {
             const task = {
                 name: 'Refresh',
@@ -511,7 +541,7 @@
 
 
             log('Collecting inventory')
-            this.inventory = await this.collectInventory()
+            await this.collectInventory()
             this.timers.inventoryUpdate = this.setupInventoryUpdate()
             this.timers.taskExecutor = this.setupTaskExecutor()
             if (this.settings.resourceWire?.enabled) this.timers.resourceWire = this.setupResourceWire()
@@ -521,7 +551,7 @@
             if (this.settings.dungeoneerWire?.enabled) this.timers.dungeoneerWire = this.setupDungeoneerWire()
             if (this.settings.labyrinth?.enabled) this.timers.labyrinth = this.setupLabyrinth()
             if (this.settings.raids?.enabled) this.timers.raids = this.setupRaids()
-            //if (this.settings.abyss?.enabled) this.timers.abyss = this.setupAbyss()
+            if (this.settings.abyss?.enabled) this.timers.abyss = this.setupAbyss()
             // this.timers.refresh = this.setupRefresh()
             this.printTimers()
         }
