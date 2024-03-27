@@ -223,10 +223,10 @@
         }
 
         async processQueue() {
-            if (queueLock) return
+            if (this.queueLock) return
 
+            this.queueLock = true
             try {
-                queueLock = true
                 let task = this.taskQueue.shift()
                 while (!!task) {
                     log('Processing task:', task.name)
@@ -238,7 +238,7 @@
                     task = this.taskQueue.shift()
                 }
             } finally {
-                queueLock = null
+                this.queueLock = null
             }
         }
 
