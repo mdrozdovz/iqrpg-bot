@@ -553,6 +553,7 @@
             if (this.settings.labyrinth?.enabled) this.timers.labyrinth = this.setupLabyrinth()
             if (this.settings.raids?.enabled) this.timers.raids = this.setupRaids()
             if (this.settings.abyss?.enabled) this.timers.abyss = this.setupAbyss()
+            if (this.settings.trinkets?.enabled) this.timers.trinkets = this.setupTrinkets()
             // this.timers.refresh = this.setupRefresh()
             this.printTimers()
         }
