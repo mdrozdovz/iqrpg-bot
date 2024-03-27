@@ -108,6 +108,16 @@ class Resource {
     }
 }
 
+class Rarity {
+    static Common = 1
+    static Uncommon = 2
+    static Rare = 3
+    static Epic = 4
+    static Legendary = 5
+    static Mythic = 6
+    static Celestial = 7
+}
+
 const charSettings = {
     // BATTLERS
     Arius: { 
