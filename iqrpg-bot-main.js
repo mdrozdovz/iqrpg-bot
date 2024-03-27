@@ -8,7 +8,7 @@
 // @match           http://test.iqrpg.com/game*
 // @icon            data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @require         https://cdn.jsdelivr.net/gh/lodash/lodash@4.17.4/dist/lodash.min.js
-// @require         https://github.com/mdrozdovz/iqrpg-bot/raw/master/character-settings.js?v=1
+// @require         https://github.com/mdrozdovz/iqrpg-bot/raw/master/character-settings.js?v=2
 // @downloadURL     https://github.com/mdrozdovz/iqrpg-bot/raw/master/iqrpg-bot-main.js
 // @updateURL       https://github.com/mdrozdovz/iqrpg-bot/raw/master/version
 // @grant           GM_info
@@ -68,7 +68,7 @@
         },
         trinkets: {
             enabled: true,
-            intervalSeconds: 12 * 3600,
+            intervalSeconds: 7 * 3600,
             keepRarity: Rarity.Mythic,
         },
     }
@@ -194,7 +194,7 @@
             new Promise(async r => {
                 while (true) {
                     if (unsafeWindow.bot.completed[task]) return r()
-                    log('awaiting')
+                    //log('awaiting')
                     await delay(1000)
                 }
             }),
@@ -208,6 +208,7 @@
         inventory
         taskQueue
         completed
+        queueLock
 
         constructor(defaultSettings, charSettings) {
             const settings = {}
@@ -218,18 +219,26 @@
             this.inventory = {}
             this.taskQueue = []
             this.completed = {}
+            this.queueLock = null
         }
 
         async processQueue() {
-            let task = this.taskQueue.shift()
-            while (!!task) {
-                log('Processing task:', task.name)
-                this.completed[task.name] = false
-                await task.exec()
-                log('Processed task:', task.name)
-                this.completed[task.name] = true
-                await delay(1000)
-                task = this.taskQueue.shift()
+            if (queueLock) return
+
+            try {
+                queueLock = true
+                let task = this.taskQueue.shift()
+                while (!!task) {
+                    log('Processing task:', task.name)
+                    this.completed[task.name] = false
+                    await task.exec()
+                    log('Processed task:', task.name)
+                    this.completed[task.name] = true
+                    await delay(1000)
+                    task = this.taskQueue.shift()
+                }
+            } finally {
+                queueLock = null
             }
         }
 
