@@ -415,6 +415,7 @@
                     await safeClick(confirmBtn)
                 }
             }
+            await safeClick(buttons.misc.view())
         }
 
         setupTaskExecutor() {
